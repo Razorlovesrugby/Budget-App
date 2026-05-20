@@ -1,0 +1,1290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Oovy & Ray's Money — iPad Cockpit Mockup</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;600;700;800&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --black: #000000;
+    --bg: #0c0c0e;
+    --surface: #111113;
+    --surface2: #18181b;
+    --surface3: #222226;
+    --border: rgba(255,255,255,0.07);
+    --border2: rgba(255,255,255,0.04);
+    --text: #ffffff;
+    --text-2: rgba(255,255,255,0.55);
+    --text-3: rgba(255,255,255,0.28);
+    --today-bg: rgba(255,255,255,0.045);
+    --today-border: rgba(255,255,255,0.12);
+    --header-h: 52px;
+    --row-h: 38px;
+    --date-col-w: 110px;
+    --account-col-w: 148px;
+    --add-col-w: 48px;
+  }
+
+  html, body {
+    width: 100%;
+    background: var(--bg);
+    font-family: 'Figtree', -apple-system, sans-serif;
+    color: var(--text);
+    overflow: hidden;
+    height: 100vh;
+  }
+
+  /* ── PAGE WRAPPER ── */
+  .page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 48px 32px 64px;
+    gap: 56px;
+    background: var(--bg);
+    overflow-y: auto;
+  }
+
+  .page-title {
+    font-size: 11px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.2);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    text-align: center;
+  }
+
+  .wordmark {
+    font-size: 36px;
+    font-weight: 800;
+    color: white;
+    letter-spacing: -1.2px;
+    text-align: center;
+  }
+  .wordmark span { color: rgba(255,255,255,0.25); }
+
+  /* ── IPAD FRAME ── */
+  .ipad-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .ipad-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.2);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .ipad {
+    width: 1180px;
+    height: 820px;
+    background: var(--black);
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.1);
+    box-shadow:
+      0 0 0 1px rgba(0,0,0,0.9),
+      0 40px 100px rgba(0,0,0,0.7),
+      inset 0 0 0 1px rgba(255,255,255,0.04);
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── TOP BAR ── */
+  .top-bar {
+    height: 52px;
+    background: rgba(10,10,12,0.95);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    gap: 0;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 50;
+  }
+
+  .app-name {
+    font-size: 16px;
+    font-weight: 700;
+    color: white;
+    letter-spacing: -0.4px;
+    margin-right: 32px;
+    white-space: nowrap;
+  }
+
+  .currency-tabs {
+    display: flex;
+    gap: 2px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 10px;
+    padding: 3px;
+    margin-right: 20px;
+  }
+
+  .tab {
+    padding: 4px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.4);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .tab.active {
+    background: rgba(255,255,255,0.12);
+    color: white;
+  }
+
+  .cash-balance-bar {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    margin-left: auto;
+  }
+
+  .cb-item {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0px;
+  }
+
+  .cb-label {
+    font-size: 9px;
+    font-weight: 600;
+    color: var(--text-3);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .cb-value {
+    font-size: 15px;
+    font-weight: 700;
+    color: white;
+    letter-spacing: -0.4px;
+  }
+
+  .cb-divider {
+    width: 1px;
+    height: 28px;
+    background: var(--border);
+  }
+
+  .top-actions {
+    display: flex;
+    gap: 8px;
+    margin-left: 24px;
+  }
+
+  .icon-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: rgba(255,255,255,0.7);
+    font-size: 14px;
+    font-weight: 600;
+    transition: background 0.15s;
+  }
+
+  .icon-btn:hover { background: rgba(255,255,255,0.12); }
+  .icon-btn.primary { background: white; color: black; border-color: white; }
+
+  /* ── GRID CONTAINER ── */
+  .grid-outer {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* Frozen header row */
+  .grid-header {
+    display: flex;
+    flex-shrink: 0;
+    background: rgba(10,10,12,0.98);
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    z-index: 30;
+    overflow: hidden;
+  }
+
+  .header-date-cell {
+    width: var(--date-col-w);
+    min-width: var(--date-col-w);
+    height: var(--header-h);
+    display: flex;
+    align-items: center;
+    padding: 0 14px;
+    border-right: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+
+  .header-date-inner {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-3);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .header-scroll {
+    display: flex;
+    overflow-x: hidden;
+    flex: 1;
+  }
+
+  .header-account-cell {
+    width: var(--account-col-w);
+    min-width: var(--account-col-w);
+    height: var(--header-h);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 12px;
+    border-right: 1px solid var(--border2);
+    flex-shrink: 0;
+    cursor: pointer;
+  }
+
+  .header-account-cell:hover { background: rgba(255,255,255,0.03); }
+
+  .account-name-header {
+    font-size: 11px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.75);
+    letter-spacing: -0.1px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .account-currency-badge {
+    font-size: 9px;
+    font-weight: 600;
+    color: var(--text-3);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-top: 2px;
+  }
+
+  .header-add-cell {
+    width: var(--add-col-w);
+    min-width: var(--add-col-w);
+    height: var(--header-h);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: rgba(255,255,255,0.3);
+    font-size: 18px;
+    border-right: 1px solid var(--border2);
+    flex-shrink: 0;
+    transition: all 0.15s;
+  }
+
+  .header-add-cell:hover {
+    color: white;
+    background: rgba(255,255,255,0.04);
+  }
+
+  /* ── GRID BODY ── */
+  .grid-body {
+    flex: 1;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    position: relative;
+    /* No bounce */
+    overscroll-behavior: none;
+    -webkit-overflow-scrolling: auto;
+  }
+
+  .grid-body::-webkit-scrollbar {
+    width: 4px;
+  }
+  .grid-body::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .grid-body::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.1);
+    border-radius: 2px;
+  }
+
+  .grid-row {
+    display: flex;
+    border-bottom: 1px solid var(--border2);
+    transition: background 0.1s;
+  }
+
+  .grid-row:hover { background: rgba(255,255,255,0.02); }
+
+  .grid-row.today {
+    background: var(--today-bg);
+    border-top: 1px solid var(--today-border);
+    border-bottom: 1px solid var(--today-border);
+  }
+
+  .grid-row.today .date-cell {
+    color: white;
+  }
+
+  .date-cell {
+    width: var(--date-col-w);
+    min-width: var(--date-col-w);
+    height: var(--row-h);
+    display: flex;
+    align-items: center;
+    padding: 0 14px;
+    border-right: 1px solid var(--border);
+    flex-shrink: 0;
+    gap: 10px;
+  }
+
+  .date-day {
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--text-3);
+    width: 24px;
+    text-align: right;
+    text-transform: uppercase;
+  }
+
+  .date-num {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-2);
+    letter-spacing: -0.2px;
+  }
+
+  .date-month {
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--text-3);
+  }
+
+  .today-pill {
+    font-size: 9px;
+    font-weight: 700;
+    color: white;
+    background: rgba(255,255,255,0.15);
+    border-radius: 4px;
+    padding: 2px 5px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    margin-left: auto;
+  }
+
+  .row-scroll {
+    display: flex;
+    overflow-x: hidden;
+    flex: 1;
+  }
+
+  .data-cell {
+    width: var(--account-col-w);
+    min-width: var(--account-col-w);
+    height: var(--row-h);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 0 12px;
+    border-right: 1px solid var(--border2);
+    flex-shrink: 0;
+    cursor: pointer;
+    position: relative;
+  }
+
+  .data-cell:hover { background: rgba(255,255,255,0.04); }
+
+  .cell-amount {
+    font-size: 12px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.75);
+    letter-spacing: -0.2px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .cell-amount.zero { color: var(--text-3); }
+  .cell-amount.dr { color: rgba(255,255,255,0.65); }
+
+  .cell-tx {
+    position: absolute;
+    left: 8px;
+    width: 3px;
+    height: 16px;
+    border-radius: 2px;
+    background: rgba(255,255,255,0.15);
+  }
+
+  .cell-tx.income { background: rgba(100,220,130,0.35); }
+  .cell-tx.expense { background: rgba(255,255,255,0.12); }
+
+  .add-cell {
+    width: var(--add-col-w);
+    min-width: var(--add-col-w);
+    height: var(--row-h);
+    flex-shrink: 0;
+  }
+
+  /* ── BOTTOM BAR ── */
+  .bottom-bar {
+    height: 40px;
+    background: rgba(10,10,12,0.97);
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    gap: 28px;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 30;
+  }
+
+  .bottom-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .bottom-label {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-3);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .bottom-value {
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.7);
+    letter-spacing: -0.3px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .bottom-divider {
+    width: 1px;
+    height: 20px;
+    background: var(--border);
+  }
+
+  .bottom-right {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .last-review {
+    font-size: 10px;
+    color: var(--text-3);
+    font-weight: 500;
+  }
+
+  /* ── TRANSACTION DETAIL PANEL ── */
+  .detail-panel-wrap {
+    position: relative;
+    width: 1180px;
+  }
+
+  .detail-panel {
+    position: absolute;
+    /* shown as overlay example */
+  }
+
+  /* ── STANDALONE PANEL MOCKUP ── */
+  .panel-mockup {
+    width: 360px;
+    background: rgba(20,20,24,0.98);
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.1);
+    box-shadow: 0 24px 80px rgba(0,0,0,0.7), 0 4px 20px rgba(0,0,0,0.5);
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  .panel-header {
+    padding: 20px 20px 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .panel-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: white;
+    letter-spacing: -0.4px;
+  }
+
+  .panel-close {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255,255,255,0.5);
+    font-size: 13px;
+    cursor: pointer;
+  }
+
+  .panel-body {
+    padding: 16px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .panel-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .panel-label {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-3);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .panel-value {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 14px;
+    font-weight: 500;
+    color: white;
+    letter-spacing: -0.2px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .panel-value.editable { cursor: text; }
+  .panel-value .chevron { color: rgba(255,255,255,0.2); font-size: 12px; }
+
+  .panel-toggle-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 10px;
+    padding: 10px 12px;
+  }
+
+  .toggle-label { font-size: 14px; font-weight: 500; color: white; }
+  .toggle-sublabel { font-size: 11px; color: var(--text-3); margin-top: 1px; }
+
+  .toggle {
+    width: 44px;
+    height: 26px;
+    border-radius: 13px;
+    background: rgba(100,220,130,0.6);
+    position: relative;
+    flex-shrink: 0;
+  }
+
+  .toggle::after {
+    content: '';
+    position: absolute;
+    top: 3px;
+    right: 3px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: white;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+  }
+
+  .toggle.off { background: rgba(255,255,255,0.15); }
+  .toggle.off::after { right: auto; left: 3px; }
+
+  .panel-freq-row {
+    display: flex;
+    gap: 6px;
+  }
+
+  .freq-chip {
+    flex: 1;
+    padding: 8px 4px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.07);
+    font-size: 11px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.35);
+    text-align: center;
+    cursor: pointer;
+    letter-spacing: -0.1px;
+  }
+
+  .freq-chip.active {
+    background: rgba(255,255,255,0.12);
+    border-color: rgba(255,255,255,0.2);
+    color: white;
+  }
+
+  .panel-footer {
+    padding: 12px 20px 20px;
+    display: flex;
+    gap: 10px;
+  }
+
+  .panel-btn {
+    flex: 1;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: -0.2px;
+  }
+
+  .panel-btn.primary { background: white; color: black; }
+  .panel-btn.danger { background: rgba(255,70,70,0.12); color: rgba(255,100,100,0.9); border: 1px solid rgba(255,70,70,0.15); }
+
+  /* ── ADD ACCOUNT PANEL ── */
+  .add-account-panel {
+    width: 320px;
+    background: rgba(20,20,24,0.98);
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.1);
+    box-shadow: 0 24px 80px rgba(0,0,0,0.7);
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  /* Layout for panels row */
+  .panels-row {
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .panel-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .panel-label-ext {
+    font-size: 11px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.2);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+    <div class="wordmark">Oovy <span>&</span> Ray's Money</div>
+    <div class="page-title">iPad Cockpit · Design Mockups</div>
+  </div>
+
+  <!-- ═══════════════════════════════════
+       IPAD — MAIN GRID VIEW
+  ═══════════════════════════════════ -->
+  <div class="ipad-wrap">
+    <div class="ipad-label">Landscape · Main Cockpit View</div>
+    <div class="ipad">
+
+      <!-- TOP BAR -->
+      <div class="top-bar">
+        <div class="app-name">Oovy & Ray's Money</div>
+
+        <div style="display:flex;align-items:center;gap:8px;margin-right:16px;">
+          <span style="font-size:10px;font-weight:600;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.06em;">Show</span>
+          <div class="currency-tabs">
+            <div class="tab active">GBP</div>
+            <div class="tab active" style="background:rgba(255,255,255,0.12);color:white;">NZD</div>
+            <div class="tab">All</div>
+          </div>
+        </div>
+
+        <!-- Date jump input -->
+        <div style="display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:6px 12px;">
+          <svg viewBox="0 0 20 20" style="width:13px;height:13px;fill:none;stroke:rgba(255,255,255,0.4);stroke-width:1.5;stroke-linecap:round;flex-shrink:0;">
+            <rect x="2" y="3" width="16" height="15" rx="3"/><path d="M14 1v4M6 1v4M2 8h16"/><circle cx="10" cy="13" r="1.5" fill="rgba(255,255,255,0.4)"/>
+          </svg>
+          <span style="font-size:12px;font-weight:500;color:rgba(255,255,255,0.4);">Jump to date</span>
+        </div>
+
+        <div class="cash-balance-bar">
+          <div class="cb-divider"></div>
+          <div class="cb-item">
+            <span class="cb-label">Cash Balance GBP</span>
+            <span class="cb-value">£11,502</span>
+          </div>
+          <div class="cb-divider"></div>
+          <div class="cb-item">
+            <span class="cb-label">Cash Balance NZD</span>
+            <span class="cb-value">NZ$25,560</span>
+          </div>
+          <div class="cb-divider"></div>
+        </div>
+
+        <div class="top-actions">
+          <div class="icon-btn primary">+</div>
+          <div class="icon-btn">•••</div>
+        </div>
+      </div>
+
+      <!-- GRID HEADER -->
+      <div class="grid-header">
+        <div class="header-date-cell">
+          <span class="header-date-inner">Date</span>
+        </div>
+        <div class="header-scroll">
+          <div class="header-account-cell">
+            <span class="account-name-header">Monzo General</span>
+            <span class="account-currency-badge">GBP · Current</span>
+          </div>
+          <div class="header-account-cell">
+            <span class="account-name-header">Monzo Spending</span>
+            <span class="account-currency-badge">GBP · Current</span>
+          </div>
+          <div class="header-account-cell">
+            <span class="account-name-header">Monzo Bills</span>
+            <span class="account-currency-badge">GBP · Current</span>
+          </div>
+          <div class="header-account-cell">
+            <span class="account-name-header">Monzo Rent+Exp</span>
+            <span class="account-currency-badge">GBP · Current</span>
+          </div>
+          <div class="header-account-cell">
+            <span class="account-name-header">Monzo Savings</span>
+            <span class="account-currency-badge">GBP · Savings</span>
+          </div>
+          <div class="header-account-cell">
+            <span class="account-name-header">Rent Deposit</span>
+            <span class="account-currency-badge">GBP · Savings</span>
+          </div>
+          <div class="header-account-cell">
+            <span class="account-name-header">Ray Revolut</span>
+            <span class="account-currency-badge">GBP · Current</span>
+          </div>
+          <div class="header-add-cell" title="Add account">+</div>
+        </div>
+      </div>
+
+      <!-- GRID BODY -->
+      <div class="grid-body">
+
+        <!-- Past rows -->
+        <div class="grid-row">
+          <div class="date-cell">
+            <span class="date-day">Mon</span>
+            <span class="date-num">12</span>
+            <span class="date-month">May</span>
+          </div>
+          <div class="row-scroll">
+            <div class="data-cell"><span class="cell-amount">£2,800</span></div>
+            <div class="data-cell"><span class="cell-amount zero">£0</span></div>
+            <div class="data-cell"><span class="cell-amount">£52</span></div>
+            <div class="data-cell"><span class="cell-amount">£250</span></div>
+            <div class="data-cell"><span class="cell-amount">£3,368</span></div>
+            <div class="data-cell"><span class="cell-amount">£1,746</span></div>
+            <div class="data-cell"><span class="cell-amount zero">£0</span></div>
+            <div class="add-cell"></div>
+          </div>
+        </div>
+
+        <div class="grid-row">
+          <div class="date-cell">
+            <span class="date-day">Tue</span>
+            <span class="date-num">13</span>
+            <span class="date-month">May</span>
+          </div>
+          <div class="row-scroll">
+            <div class="data-cell"><div class="cell-tx expense"></div><span class="cell-amount">(£200)</span></div>
+            <div class="data-cell"><div class="cell-tx income"></div><span class="cell-amount">£200</span></div>
+            <div class="data-cell"><span class="cell-amount">£52</span></div>
+            <div class="data-cell"><span class="cell-amount">£250</span></div>
+            <div class="data-cell"><span class="cell-amount">£3,368</span></div>
+            <div class="data-cell"><span class="cell-amount">£1,746</span></div>
+            <div class="data-cell"><span class="cell-amount zero">£0</span></div>
+            <div class="add-cell"></div>
+          </div>
+        </div>
+
+        <div class="grid-row">
+          <div class="date-cell">
+            <span class="date-day">Wed</span>
+            <span class="date-num">14</span>
+            <span class="date-month">May</span>
+          </div>
+          <div class="row-scroll">
+            <div class="data-cell"><span class="cell-amount">(£200)</span></div>
+            <div class="data-cell"><span class="cell-amount">£200</span></div>
+            <div class="data-cell"><span class="cell-amount">£52</span></div>
+            <div class="data-cell"><span class="cell-amount">£250</span></div>
+            <div class="data-cell"><span class="cell-amount">£3,368</span></div>
+            <div class="data-cell"><span class="cell-amount">£1,746</span></div>
+            <div class="data-cell"><span class="cell-amount zero">£0</span></div>
+            <div class="add-cell"></div>
+          </div>
+        </div>
+
+        <div class="grid-row">
+          <div class="date-cell">
+            <span class="date-day">Thu</span>
+            <span class="date-num">15</span>
+            <span class="date-month">May</span>
+          </div>
+          <div class="row-scroll">
+            <div class="data-cell"><div class="cell-tx expense"></div><span class="cell-amount">£2,422</span></div>
+            <div class="data-cell"><span class="cell-amount">£200</span></div>
+            <div class="data-cell"><div class="cell-tx income"></div><span class="cell-amount">£230</span></div>
+            <div class="data-cell"><span class="cell-amount">£250</span></div>
+            <div class="data-cell"><span class="cell-amount">£3,368</span></div>
+            <div class="data-cell"><span class="cell-amount">£1,746</span></div>
+            <div class="data-cell"><span class="cell-amount zero">£0</span></div>
+            <div class="add-cell"></div>
+          </div>
+        </div>
+
+        <div class="grid-row">
+          <div class="date-cell">
+            <span class="date-day">Fri</span>
+            <span class="date-num">16</span>
+            <span class="date-month">May</span>
+          </div>
+          <div class="row-scroll">
+            <div class="data-cell"><span class="cell-amount">£2,422</span></div>
+            <div class="data-cell"><span class="cell-amount">£200</span></div>
+            <div class="data-cell"><span class="cell-amount">£230</span></div>
+            <div class="data-cell"><span class="cell-amount">£250</span></div>
+            <div class="data-cell"><span class="cell-amount">£3,368</span></div>
+            <div class="data-cell"><span class="cell-amount">£1,746</span></div>
+            <div class="data-cell"><span class="cell-amount zero">£0</span></div>
+            <div class="add-cell"></div>
+          </div>
+        </div>
+
+        <div class="grid-row">
+          <div class="date-cell">
+            <span class="date-day">Sat</span>
+            <span class="date-num">17</span>
+            <span class="date-month">May</span>
+          </div>
+          <div class="row-scroll">
+            <div class="data-cell"><div class="cell-tx income"></div><span class="cell-amount">£6,334</span></div>
+            <div class="data-cell"><span class="cell-amount">£200</span></div>
+            <div class="data-cell"><span class="cell-amount">£230</span></div>
+            <div class="data-cell"><span class="cell-amount">£250</span></div>
+            <div class="data-cell"><span class="cell-amount">£3,368</span></div>
+            <div class="data-cell"><span class="cell-amount">£1,746</span></div>
+            <div class="data-cell"><span class="cell-amount zero">£0</span></div>
+            <div class="add-cell"></div>
+          </div>
+        </div>
+
+        <div class="grid-row">
+          <div class="date-cell">
+            <span class="date-day">Sun</span>
+            <span class="date-num">18</span>
+            <span class="date-month">May</span>
+          </div>
+          <div class="row-scroll">
+            <div class="data-cell"><span class="cell-amount">£6,334</span></div>
+            <div class="data-cell"><span class="cell-amount">£200</span></div>
+            <div class="data-cell"><span class="cell-amount">£230</span></div>
+            <div class="data-cell"><span class="cell-amount">£250</span></div>
+            <div class="data-cell"><span class="cell-amount">£3,368</span></div>
+            <div class="data-cell"><span class="cell-amount">£1,746</span></div>
+            <div class="data-cell"><span class="cell-amount zero">£0</span></div>
+            <div class="add-cell"></div>
+          </div>
+        </div>
+
+        <div class="grid-row">
+          <div class="date-cell">
+            <span class="date-day">Sun</span>
+            <span class="date-num">19</span>
+            <span class="date-month">May</span>
+          </div>
+          <div class="row-scroll">
+            <div class="data-cell"><span class="cell-amount">£6,334</span></div>
+            <div class="data-cell"><span class="cell-amount">£200</span></div>
+            <div class="data-cell"><span class="cell-amount">£230</span></div>
+            <div class="data-cell"><span class="cell-amount">£250</span></div>
+            <div class="data-cell"><span class="cell-amount">£3,368</span></div>
+            <div class="data-cell"><span class="cell-amount">£1,746</span></div>
+            <div class="data-cell"><span class="cell-amount zero">£0</span></div>
+            <div class="add-cell"></div>
+          </div>
+        </div>
+
+        <!-- TODAY ROW -->
+        <div class="grid-row today">
+          <div class="date-cell">
+            <span class="date-day">Tue</span>
+            <span class="date-num" style="color:white;font-weight:700;">20</span>
+            <span class="date-month">May</span>
+            <div class="today-pill">Today</div>
+          </div>
+          <div class="row-scroll">
+            <div class="data-cell"><div class="cell-tx expense"></div><span class="cell-amount" style="color:white;font-weight:600;">£5,934</span></div>
+            <div class="data-cell"><span class="cell-amount" style="color:white;font-weight:600;">£200</span></div>
+            <div class="data-cell"><span class="cell-amount" style="color:white;font-weight:600;">£230</span></div>
+            <div class="data-cell"><span class="cell-amount" style="color:white;font-weight:600;">£250</span></div>
+            <div class="data-cell"><span class="cell-amount" style="color:white;font-weight:600;">£3,368</span></div>
+            <div class="data-cell"><span class="cell-amount" style="color:white;font-weight:600;">£1,746</span></div>
+            <div class="data-cell"><span class="cell-amount zero">£0</span></div>
+            <div class="add-cell"></div>
+          </div>
+        </div>
+
+        <!-- FUTURE ROWS -->
+        <div class="grid-row">
+          <div class="date-cell">
+            <span class="date-day">Wed</span>
+            <span class="date-num">21</span>
+            <span class="date-month">May</span>
+          </div>
+          <div class="row-scroll">
+            <div class="data-cell"><span class="cell-amount">£5,934</span></div>
+            <div class="data-cell"><span class="cell-amount">£200</span></div>
+            <div class="data-cell"><span class="cell-amount">£230</span></div>
+            <div class="data-cell"><span class="cell-amount">£250</span></div>
+            <div class="data-cell"><span class="cell-amount">£3,368</span></div>
+            <div class="data-cell"><span class="cell-amount">£1,746</span></div>
+            <div class="data-cell"><span class="cell-amount zero">£0</span></div>
+            <div class="add-cell"></div>
+          </div>
+        </div>
+
+        <div class="grid-row">
+          <div class="date-cell">
+            <span class="date-day">Thu</span>
+            <span class="date-num">22</span>
+            <span class="date-month">May</span>
+          </div>
+          <div class="row-scroll">
+            <div class="data-cell"><span class="cell-amount">£5,934</span></div>
+            <div class="data-cell"><span class="cell-amount">£200</span></div>
+            <div class="data-cell"><span class="cell-amount">£230</span></div>
+            <div class="data-cell"><span class="cell-amount">£250</span></div>
+            <div class="data-cell"><span class="cell-amount">£3,368</span></div>
+            <div class="data-cell"><span class="cell-amount">£1,746</span></div>
+            <div class="data-cell"><span class="cell-amount zero">£0</span></div>
+            <div class="add-cell"></div>
+          </div>
+        </div>
+
+        <div class="grid-row">
+          <div class="date-cell">
+            <span class="date-day">Fri</span>
+            <span class="date-num">23</span>
+            <span class="date-month">May</span>
+          </div>
+          <div class="row-scroll">
+            <div class="data-cell"><span class="cell-amount">£5,934</span></div>
+            <div class="data-cell"><div class="cell-tx expense"></div><span class="cell-amount">£0</span></div>
+            <div class="data-cell"><span class="cell-amount">£230</span></div>
+            <div class="data-cell"><span class="cell-amount">£250</span></div>
+            <div class="data-cell"><span class="cell-amount">£3,368</span></div>
+            <div class="data-cell"><span class="cell-amount">£1,746</span></div>
+            <div class="data-cell"><span class="cell-amount zero">£0</span></div>
+            <div class="add-cell"></div>
+          </div>
+        </div>
+
+        <div class="grid-row">
+          <div class="date-cell">
+            <span class="date-day">Mon</span>
+            <span class="date-num">26</span>
+            <span class="date-month">May</span>
+          </div>
+          <div class="row-scroll">
+            <div class="data-cell"><div class="cell-tx expense"></div><span class="cell-amount">£5,534</span></div>
+            <div class="data-cell"><div class="cell-tx income"></div><span class="cell-amount">£200</span></div>
+            <div class="data-cell"><span class="cell-amount">£230</span></div>
+            <div class="data-cell"><span class="cell-amount">£250</span></div>
+            <div class="data-cell"><span class="cell-amount">£3,368</span></div>
+            <div class="data-cell"><span class="cell-amount">£1,746</span></div>
+            <div class="data-cell"><span class="cell-amount zero">£0</span></div>
+            <div class="add-cell"></div>
+          </div>
+        </div>
+
+        <div class="grid-row">
+          <div class="date-cell">
+            <span class="date-day">Fri</span>
+            <span class="date-num">30</span>
+            <span class="date-month">May</span>
+          </div>
+          <div class="row-scroll">
+            <div class="data-cell"><div class="cell-tx expense"></div><span class="cell-amount">£5,206</span></div>
+            <div class="data-cell"><span class="cell-amount">£200</span></div>
+            <div class="data-cell"><div class="cell-tx expense"></div><span class="cell-amount">£52</span></div>
+            <div class="data-cell"><span class="cell-amount">£250</span></div>
+            <div class="data-cell"><div class="cell-tx expense"></div><span class="cell-amount">£2,868</span></div>
+            <div class="data-cell"><span class="cell-amount">£1,746</span></div>
+            <div class="data-cell"><span class="cell-amount zero">£0</span></div>
+            <div class="add-cell"></div>
+          </div>
+        </div>
+
+        <div class="grid-row">
+          <div class="date-cell">
+            <span class="date-day">Sun</span>
+            <span class="date-num">1</span>
+            <span class="date-month">Jun</span>
+          </div>
+          <div class="row-scroll">
+            <div class="data-cell"><div class="cell-tx expense"></div><span class="cell-amount">£3,056</span></div>
+            <div class="data-cell"><span class="cell-amount">£200</span></div>
+            <div class="data-cell"><span class="cell-amount">£52</span></div>
+            <div class="data-cell"><div class="cell-tx income"></div><span class="cell-amount">£2,050</span></div>
+            <div class="data-cell"><span class="cell-amount">£2,868</span></div>
+            <div class="data-cell"><span class="cell-amount">£1,746</span></div>
+            <div class="data-cell"><span class="cell-amount zero">£0</span></div>
+            <div class="add-cell"></div>
+          </div>
+        </div>
+
+        <div class="grid-row">
+          <div class="date-cell">
+            <span class="date-day">Mon</span>
+            <span class="date-num">2</span>
+            <span class="date-month">Jun</span>
+          </div>
+          <div class="row-scroll">
+            <div class="data-cell"><div class="cell-tx expense"></div><span class="cell-amount">£2,656</span></div>
+            <div class="data-cell"><div class="cell-tx income"></div><span class="cell-amount">£200</span></div>
+            <div class="data-cell"><span class="cell-amount">£52</span></div>
+            <div class="data-cell"><span class="cell-amount">£2,050</span></div>
+            <div class="data-cell"><span class="cell-amount">£2,868</span></div>
+            <div class="data-cell"><span class="cell-amount">£1,746</span></div>
+            <div class="data-cell"><span class="cell-amount zero">£0</span></div>
+            <div class="add-cell"></div>
+          </div>
+        </div>
+
+        <div class="grid-row">
+          <div class="date-cell">
+            <span class="date-day">Tue</span>
+            <span class="date-num">15</span>
+            <span class="date-month">Jun</span>
+          </div>
+          <div class="row-scroll">
+            <div class="data-cell"><div class="cell-tx income"></div><span class="cell-amount">£6,456</span></div>
+            <div class="data-cell"><span class="cell-amount">£200</span></div>
+            <div class="data-cell"><span class="cell-amount">£52</span></div>
+            <div class="data-cell"><span class="cell-amount">£2,050</span></div>
+            <div class="data-cell"><span class="cell-amount">£2,868</span></div>
+            <div class="data-cell"><span class="cell-amount">£1,746</span></div>
+            <div class="data-cell"><span class="cell-amount zero">£0</span></div>
+            <div class="add-cell"></div>
+          </div>
+        </div>
+
+      </div><!-- end grid-body -->
+
+      <!-- BOTTOM BAR -->
+      <div class="bottom-bar">
+        <div class="bottom-item">
+          <span class="bottom-label">GBP Total</span>
+          <span class="bottom-value">£11,502</span>
+        </div>
+        <div class="bottom-divider"></div>
+        <div class="bottom-item">
+          <span class="bottom-label">NZD Total</span>
+          <span class="bottom-value">NZ$25,560</span>
+        </div>
+        <div class="bottom-divider"></div>
+        <div class="bottom-item">
+          <span class="bottom-label">Rate</span>
+          <span class="bottom-value">1 GBP = 2.22 NZD</span>
+        </div>
+        <div class="bottom-right">
+          <span class="last-review">Last review: 17 May 2026</span>
+          <div style="height:20px;width:1px;background:var(--border);"></div>
+          <div style="font-size:11px;color:rgba(255,255,255,0.25);">Forecasting to Dec 2026</div>
+        </div>
+      </div>
+
+    </div><!-- end ipad -->
+  </div>
+
+  <!-- ═══════════════════════════════════
+       PANEL MOCKUPS
+  ═══════════════════════════════════ -->
+  <div class="panels-row">
+
+    <!-- TRANSACTION DETAIL PANEL -->
+    <div class="panel-wrap">
+      <div class="panel-label-ext">Transaction Detail Panel</div>
+      <div class="panel-mockup">
+        <div class="panel-header">
+          <div class="panel-title">Transaction</div>
+          <div class="panel-close">✕</div>
+        </div>
+        <div class="panel-body">
+
+          <div class="panel-field">
+            <span class="panel-label">Name</span>
+            <div class="panel-value editable">
+              <span style="color:rgba(255,255,255,0.3);">Untitled</span>
+              <span class="chevron">›</span>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:10px;">
+            <div class="panel-field" style="flex:1;">
+              <span class="panel-label">Type</span>
+              <div class="panel-freq-row">
+                <div class="freq-chip active">DR</div>
+                <div class="freq-chip">CR</div>
+              </div>
+            </div>
+            <div class="panel-field" style="flex:1;">
+              <span class="panel-label">Amount</span>
+              <div class="panel-value editable">(£178.34) <span class="chevron">›</span></div>
+            </div>
+          </div>
+
+          <div class="panel-field">
+            <span class="panel-label">Date</span>
+            <div class="panel-value editable">30 May 2026 <span class="chevron">›</span></div>
+          </div>
+
+          <div class="panel-field">
+            <span class="panel-label">From Account</span>
+            <div class="panel-value">Monzo General <span class="chevron">›</span></div>
+          </div>
+
+          <div class="panel-field">
+            <span class="panel-label">To Account</span>
+            <div class="panel-value">Monzo Bills <span class="chevron">›</span></div>
+          </div>
+
+          <div class="panel-toggle-row">
+            <div>
+              <div class="toggle-label">Recurring</div>
+              <div class="toggle-sublabel">Repeats on a schedule</div>
+            </div>
+            <div class="toggle"></div>
+          </div>
+
+          <div class="panel-field">
+            <span class="panel-label">Frequency</span>
+            <div class="panel-freq-row">
+              <div class="freq-chip">Weekly</div>
+              <div class="freq-chip">Fortnightly</div>
+              <div class="freq-chip active">Monthly</div>
+              <div class="freq-chip">Quarterly</div>
+            </div>
+          </div>
+
+        </div>
+        <div class="panel-footer">
+          <div class="panel-btn danger">Delete</div>
+          <div class="panel-btn primary">Save</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ADD ACCOUNT PANEL -->
+    <div class="panel-wrap">
+      <div class="panel-label-ext">Add Account Panel</div>
+      <div class="panel-mockup" style="width:320px;">
+        <div class="panel-header">
+          <div class="panel-title">New Account</div>
+          <div class="panel-close">✕</div>
+        </div>
+        <div class="panel-body">
+
+          <div class="panel-field">
+            <span class="panel-label">Account Name</span>
+            <div class="panel-value editable">
+              <span style="color:rgba(255,255,255,0.3);">e.g. Holiday Fund</span>
+              <span class="chevron">›</span>
+            </div>
+          </div>
+
+          <div class="panel-field">
+            <span class="panel-label">Currency</span>
+            <div class="panel-freq-row">
+              <div class="freq-chip active">GBP £</div>
+              <div class="freq-chip">NZD $</div>
+            </div>
+          </div>
+
+          <div class="panel-field">
+            <span class="panel-label">Account Type</span>
+            <div class="panel-freq-row" style="flex-wrap:wrap;gap:6px;">
+              <div class="freq-chip active">Current</div>
+              <div class="freq-chip">Savings</div>
+              <div class="freq-chip">Credit</div>
+              <div class="freq-chip">Tracking</div>
+            </div>
+          </div>
+
+          <div class="panel-toggle-row">
+            <div>
+              <div class="toggle-label">Include in Cash Balance</div>
+              <div class="toggle-sublabel">Counts toward total</div>
+            </div>
+            <div class="toggle"></div>
+          </div>
+
+          <div class="panel-toggle-row">
+            <div>
+              <div class="toggle-label">Include in Review</div>
+              <div class="toggle-sublabel">Appears in weekly review</div>
+            </div>
+            <div class="toggle"></div>
+          </div>
+
+        </div>
+        <div class="panel-footer">
+          <div class="panel-btn primary" style="flex:1;">Create Account</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end panels-row -->
+
+</div><!-- end page -->
+
+</body>
+</html>
