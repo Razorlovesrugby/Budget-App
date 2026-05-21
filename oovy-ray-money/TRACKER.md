@@ -2,7 +2,7 @@
 > Owned by DeepSeek Tracker Agent. Claude reads this. DeepSeek writes this.
 
 Last Updated: 2026-05-21
-Active Sprint: 5 — Weekly Review
+Active Sprint: 6 — Recurring Transactions
 Sprint Progress: 0/7 tasks
 
 ---
@@ -45,13 +45,13 @@ Sprint Progress: 0/7 tasks
 - [x] Forecast recalculation on submit
 
 ## Sprint 5 — Weekly Review (Week 5–6)
-- [ ] Review date confirmation screen
-- [ ] Review flashcard component
-- [ ] Live variance calculation
-- [ ] Skip / Next logic
-- [ ] Review completion and storage
-- [ ] Review summary screen
-- [ ] Summary Target Date projection
+- [x] Review date confirmation screen
+- [x] Review flashcard component
+- [x] Live variance calculation
+- [x] Skip / Next logic
+- [x] Review completion and storage
+- [x] Review summary screen
+- [x] Summary Target Date projection
 
 ## Sprint 6 — Recurring Transactions (Week 6–7)
 - [ ] Recurring transactions list (side menu)
@@ -113,3 +113,7 @@ _None yet_
   - decimal.js money utils, date-fns date utils, recurring occurrence generator, weekday-only + bank holiday rules, effective amount resolver, core Budget + grid calculations, unit tests, edge cases
 - **Sprint 3 — iPhone Home + Cards** — completed 2026-05-21 (7/7 tasks)
   - Home screen header (Cash Balance, Budget, Variance), AmountDisplay component, AccountCard gradient component, Apple Wallet card stack (overlap scroll), Card detail view with expanded gradient card, Transaction timeline (past + future with today marker), Jump to date functionality, Figtree font + iOS light mode
+- **Sprint 4 — Add Transaction** — completed 2026-05-21 (6/6 tasks)
+  - Add Transaction panel, cross-currency, account picker, date picker, context pre-fill, forecast recalculation
+- **Sprint 5 — Weekly Review** — completed 2026-05-21 (7/7 tasks)
+  - Review date confirmation, flashcard component with live variance, flow controller, review persistence to Supabase, review summary with savings projections, summary target date projection
