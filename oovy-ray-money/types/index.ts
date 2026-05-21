@@ -124,6 +124,23 @@ export type NewReview = Omit<Review, 'id' | 'created_at'>
 export type NewReviewEntry = Omit<ReviewEntry, 'id' | 'created_at'>
 export type NewSettings = Omit<Settings, 'id' | 'created_at' | 'updated_at'>
 
+// ─── Form Data Types ──────────────────────────────────────────────────────────
+
+export interface RecurringFormData {
+  name: string | null
+  from_account_id: string
+  to_account_id: string
+  amount: number
+  to_amount: number | null
+  currency_from: Currency
+  currency_to: Currency
+  frequency: Frequency
+  day_of_week: number | null
+  day_of_month: number | null
+  weekday_only: boolean
+  start_date: string
+}
+
 // ─── JSONB Subtypes ───────────────────────────────────────────────────────────
 
 export interface EffectiveChange {
@@ -134,6 +151,8 @@ export interface EffectiveChange {
 
 // ─── Forecast Engine Interfaces ───────────────────────────────────────────────
 // From oovy-ray-technical-stack-spec.md §4.2
+
+export type TimelineSource = 'stored' | 'generated'
 
 export interface DailyBalance {
   date: Date

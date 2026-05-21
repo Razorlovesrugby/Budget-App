@@ -2,9 +2,9 @@
 > Owned by DeepSeek Tracker Agent. Claude reads this. DeepSeek writes this.
 
 Last Updated: 2026-05-21
-Active Sprint: 6 — Recurring Transactions
-Sprint Progress: 0/7 tasks
-Spec Status: Reviewed — 10 flaws found, 9 fixed (Decisions A2, B1 incorporated)
+Active Sprint: 7 — iPad Cockpit Grid
+Sprint Progress: 0/9 tasks
+Spec Status: Reviewed
 
 ---
 
@@ -55,13 +55,13 @@ Spec Status: Reviewed — 10 flaws found, 9 fixed (Decisions A2, B1 incorporated
 - [x] Summary Target Date projection
 
 ## Sprint 6 — Recurring Transactions (Week 6–7)
-- [ ] Recurring transactions list (side menu)
-- [ ] Add recurring form (with all frequency options)
-- [ ] Edit recurring (three scopes: this / future / all)
-- [ ] Delete recurring (three scopes)
-- [ ] Effective date prompt for future edits
-- [ ] Weekday-only toggle
-- [ ] Recurring transactions shown in timeline
+- [x] Recurring transactions list (side menu)
+- [x] Add recurring form (with all frequency options)
+- [x] Edit recurring (three scopes: this / future / all)
+- [x] Delete recurring (three scopes)
+- [x] Effective date prompt for future edits
+- [x] Weekday-only toggle
+- [x] Recurring transactions shown in timeline
 
 ## Sprint 7 — iPad Cockpit Grid (Week 7–9)
 - [ ] Grid layout (frozen headers, frozen date column, frozen bottom bar)
@@ -117,5 +117,7 @@ _None yet_
   - Home screen header (Cash Balance, Budget, Variance), AmountDisplay component, AccountCard gradient component, Apple Wallet card stack (overlap scroll), Card detail view with expanded gradient card, Transaction timeline (past + future with today marker), Jump to date functionality, Figtree font + iOS light mode
 - **Sprint 4 — Add Transaction** — completed 2026-05-21 (6/6 tasks)
   - Add Transaction panel, cross-currency, account picker, date picker, context pre-fill, forecast recalculation
+- **Sprint 6 — Recurring Transactions** — completed 2026-05-21 (7/7 tasks)
+  - List page with next occurrence display, add form (all 5 frequencies), edit/delete (3 scopes each), weekday-only toggle, timeline integration
 - **Sprint 5 — Weekly Review** — completed 2026-05-21 (7/7 tasks)
   - Review date confirmation, flashcard component with live variance, flow controller, review persistence to Supabase, review summary with savings projections, summary target date projection
