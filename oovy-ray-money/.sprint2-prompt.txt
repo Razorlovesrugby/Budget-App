@@ -1,0 +1,28 @@
+Implement Sprint 2 of Oovy & Ray's Money budget app.
+
+Read the full spec: /specs/sprint-2-forecast-engine-spec.md
+Read the types: /types/index.ts
+Project uses Next.js 14, TypeScript strict, decimal.js, date-fns v3.
+CRITICAL: decimal.js for ALL money math. Debit format: (£200.00). NZD prefix: NZ$. Never float arithmetic.
+
+9 TASKS TO COMPLETE IN ORDER:
+
+1. CREATE /lib/utils/money.ts — Decimal.set({precision:14,rounding:ROUND_HALF_UP}). Export: toDecimal, fromDecimal, formatMoney (en-GB commas, negative→brackets like '(£200.00)', NZ$ prefix), formatDebit (always brackets), add/subtract/multiply/divide, sum, isGreaterThan/isLessThan/isZero, gbpToNzd, nzdToGbp.
+
+2. CREATE /lib/utils/dates.ts — parseDate, toDateString('yyyy-MM-dd'), formatDisplayDate('d MMM yyyy'), formatShortDate('d MMM'), isOnOrBefore/isOnOrAfter/isBetween, nextOccurrenceDate (all 5 frequencies with month-end safety), getSafeDayOfMonth, applyWeekdayRule (Sat→Fri, Sun→Fri, bank holiday loop), isUKBankHoliday (hardcoded 2024-2030).
+
+3. CREATE /lib/forecast/recurring.ts — RecurringOccurrence interface, generateOccurrences (with skips/overrides/effective amounts), getNextOccurrence, getFirstOccurrence.
+
+4. Task 4 (weekday-only rule) included in Task 2 above.
+
+5. CREATE /lib/forecast/effective-amount.ts — getEffectiveAmount (sort by effective_from DESC, find first <= date, throw if none), getEffectiveAmounts.
+
+6. CREATE /lib/forecast/engine.ts — calculateBudget (opening_balance + CRs - DRs, CR before DR same day, skip stored RECURRING_INSTANCE duplicates), calculateAllBudgets.
+
+7. ADD to engine.ts: getTimeline (running balance day-by-day), getGrid (Map<accountId,Map<dateISO,balance>>).
+
+8. npm install -D vitest, create vitest.config.ts (@ alias), add test scripts. Write tests in /lib/forecast/__tests__/ for money, dates, recurring, effective-amount, engine.
+
+9. Verify edge cases: month-end 31st→30th/28th, leap Feb 29, bank holiday weekday rule, negative budget OK, same-day CR-before-DR. npm run build && npm test must pass.
+
+Output TASK DONE after each task. Fix any issues — do not leave broken code.
