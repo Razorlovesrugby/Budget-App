@@ -81,7 +81,7 @@ CREATE TABLE transactions (
   currency_from     currency NOT NULL,
   currency_to       currency NOT NULL,
   transaction_date  DATE NOT NULL,
-  recurring_id      UUID REFERENCES recurring_schedules(id),
+  recurring_id      UUID REFERENCES recurring_schedules(id) ON DELETE SET NULL,
   is_adjustment     BOOLEAN NOT NULL DEFAULT false,
   note              TEXT,
   created_at        TIMESTAMPTZ NOT NULL DEFAULT now(),

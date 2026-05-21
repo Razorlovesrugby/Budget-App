@@ -169,7 +169,7 @@ File: `/lib/forecast/next-occurrence.ts` — Next occurrence helper
 ```typescript
 import { RecurringSchedule } from '@/types'
 import { getFirstOccurrence, getNextOccurrence } from './recurring'
-import { parseDate } from '@/lib/utils/dates'
+import { parseDate, isSameDay, isOnOrAfter } from '@/lib/utils/dates'
 
 export function getNextOccurrenceDate(
   schedule: RecurringSchedule,
@@ -185,10 +185,18 @@ export function getNextOccurrenceDate(
   // If first occurrence is in the future (schedule hasn't started yet)
   if (firstDate > fromDate) return firstDate
   
-  // Find the next occurrence after fromDate
-  return getNextOccurrence(schedule, fromDate)
+  // Find the next occurrence on or after fromDate
+  // getNextOccurrence returns the occurrence strictly AFTER the given date.
+  // If fromDate IS an occurrence, step back 1 day so getNextOccurrence returns today.
+  const searchFrom = isSameDay(fromDate, getNextOccurrence(schedule, subDays(fromDate, 1))!)
+    ? subDays(fromDate, 1)
+    : fromDate
+  
+  return getNextOccurrence(schedule, searchFrom)
 }
 ```
+
+> **Clarification:** If `fromDate` is itself an occurrence date, return that same date (display as "Today"), not the next one after it. The helper steps back 1 day to trigger `getNextOccurrence` to land on `fromDate` when it's a valid occurrence. Adds `subDays` from date-fns.
 
 ### Display Format
 
@@ -310,7 +318,8 @@ interface RecurringFormData {
   name: string | null
   from_account_id: string
   to_account_id: string
-  amount: number                    // Base amount (first effective_change)
+  amount: number                    // Amount in From account's currency
+  to_amount: number | null          // Only set when cross-currency; otherwise null
   currency_from: Currency           // Derived from From account
   currency_to: Currency             // Derived from To account
   frequency: Frequency
@@ -320,6 +329,16 @@ interface RecurringFormData {
   start_date: string                // 'YYYY-MM-DD'
 }
 ```
+
+> **Cross-currency detection:** `isCrossCurrency = currency_from !== currency_to`. When true, the form shows a second amount field for `to_amount`. The interface uses `to_amount: number | null` — `null` for same-currency transactions.
+
+> **Start date default (add mode):** Default `start_date` to the **first occurrence date** matching the selected frequency + day anchor, not just today. Examples:
+> - "Monthly on 15th" + today is May 21 → default start_date to June 15
+> - "Weekly on Monday" + today is Thursday May 21 → default start_date to Monday May 25
+> - "Fortnightly" + today is May 21 → default start_date to today (no anchor)
+> - "Quarterly on 31st" → snap to next matching date
+> 
+> This prevents phantom first occurrences. See **Decision B1** — the `start_date` IS the first occurrence date.
 
 ### Cross-Currency Support
 
@@ -357,11 +376,13 @@ BIANNUAL    — Every 6 months on [day]
 export async function createRecurringSchedule(data: RecurringFormData): Promise<string> {
   const supabase = createSupabaseBrowserClient()
   
-  // Build initial effective_change with the starting amount
+  const isCrossCurrency = data.currency_from !== data.currency_to
+  
+  // Build initial effective_change with the starting amount(s)
   const initialChange: EffectiveChange = {
     effective_from: data.start_date,
     amount_from: data.amount,
-    amount_to: data.isCrossCurrency ? data.amountTo : data.amount,
+    amount_to: isCrossCurrency ? data.to_amount! : data.amount,
   }
   
   const { data: schedule, error } = await supabase
@@ -477,8 +498,8 @@ File: `/app/recurring/[id]/edit/page.tsx` — Edit Recurring page
   ```
 - Past occurrences (before the effective date) keep their old amounts
 - Future occurrences use the new amount
-- User can change: amount, name (future only), weekday_only
-- Cannot change: frequency, accounts (those require "Entire series")
+- User can change: amount, name (future only)
+- Cannot change: frequency, accounts, weekday_only (those require "Entire series")
 
 ### Scope 3: Entire Series
 
@@ -673,34 +694,23 @@ This is a partial task — the toggle is already in the add form (Task 3). This 
 
 - Add form: toggle visible, default OFF
 - Edit form (Scope 3 — entire series): toggle editable
-- Edit form (Scope 2 — all future): toggle editable, applies from effective date
-- Edit form (Scope 1 — this occurrence): toggle hidden (applies to the override only via manual date change)
+- Edit form (Scope 2 — all future): toggle read-only (weekday_only is a series-level property, not date-ranged)
+- Edit form (Scope 1 — this occurrence): toggle hidden (not applicable to single-occurrence overrides)
 
 ### Toggle Behaviour
 
-```
-Weekday only    [OFF ●]
-               When ON, moves weekend
-               occurrences to the Friday
-               before
-```
+```\nWeekday only    [OFF ●]\n               When ON, moves weekend\n               occurrences to the Friday\n               before\n```
 
-### Effect on Occurrences
-
-When `weekday_only = true`:
-- Saturday scheduled dates → move to Friday
-- Sunday scheduled dates → move to Friday
-- Bank holidays → move to day before (recursive)
-- Uses the `applyWeekdayRule()` function from Sprint 2
-
-When `weekday_only = false`:
-- Transaction falls on the scheduled date regardless of day
+- **Add form:** toggle visible, default OFF, fully editable
+- **Edit form (Scope 3 — entire series):** toggle editable
+- **Edit form (Scope 2 — all future):** toggle shown as read-only with note: "Change the weekday rule for all future occurrences in Entire Series mode."
+- **Edit form (Scope 1 — this occurrence):** toggle hidden (not applicable to single-occurrence overrides)
 
 ### Storage
 
 - Stored as `weekday_only` boolean on `recurring_schedules`
-- Scope 2 (all future): changing this adds a note to the effective_changes? No — weekday_only is a schedule-level property, not an amount. For now, changing it for "all future" updates the schedule row and a comment is stored as metadata.
-- Simplification: weekday_only only editable with Scope 3 (entire series). For Scope 2, show it as read-only with a note: "Change the weekday rule for all future occurrences in Entire Series mode."
+- Changed only via Scope 3 (entire series) — updates the schedule row directly
+- Scope 1 and 2 do not modify `weekday_only`
 
 ### Acceptance Criteria
 
@@ -727,10 +737,27 @@ File: `/lib/forecast/timeline-helpers.ts` — Merge stored + recurring into time
 
 ### Merging Stored and Recurring
 
-The timeline shows both stored transactions and future recurring projections:
+The timeline shows both stored transactions and future recurring projections.
 
 ```typescript
-export function mergeTransactionsAndOccurrences(
+// Type defined in @/types — add this to types/index.ts:
+export type TimelineSource = 'stored' | 'generated'
+
+export interface TimelineEntry {
+  date: Date
+  name: string | null
+  from_account_id: string
+  to_account_id: string
+  amount_from: number           // DECIMAL(12,2) — number for display, wrap in Decimal for math
+  amount_to: number             // DECIMAL(12,2)
+  currency_from: Currency
+  currency_to: Currency
+  isRecurring: boolean
+  recurring_id: string | null
+  source: TimelineSource       // 'stored' = from transactions table, 'generated' = from occurrence generator
+}
+
+function mergeTransactionsAndOccurrences(
   storedTransactions: Transaction[],
   recurringSchedules: RecurringSchedule[],
   recurringSkips: RecurringSkip[],
@@ -843,6 +870,47 @@ All 7 tasks complete. Verifiable by:
 - [ ] Cross-currency recurring: dual amount fields, stored in effective_changes
 - [ ] All amounts use decimal.js, NZ$ prefix, debit bracket notation
 - [ ] TypeScript strict: zero errors
+
+---
+
+## Migrations (run before Sprint 6)
+
+### Migration 1: Fix dangling recurring_id FK
+
+File: `supabase/migrations/001_fix_recurring_fk.sql`
+
+Run in Supabase SQL Editor before starting Sprint 6:
+```sql
+ALTER TABLE transactions DROP CONSTRAINT IF EXISTS transactions_recurring_id_fkey;
+ALTER TABLE transactions ADD CONSTRAINT transactions_recurring_id_fkey FOREIGN KEY (recurring_id) REFERENCES recurring_schedules(id) ON DELETE SET NULL;
+```
+
+Stored historical transactions preserved on Scope 3 delete, `recurring_id` set to NULL.
+
+---
+
+## DB Utility Functions
+
+File: `/lib/db/recurring.ts` — All DB operations for recurring schedules:
+
+| Function | Used In |
+|---|---|
+| `getRecurringSchedules()` | Tasks 1, 7 |
+| `getRecurringSchedule(id)` | Task 4 |
+| `createOverride(recurring_id, override)` | Task 4 Scope 1 |
+| `appendEffectiveChange(scheduleId, effectiveFrom, newAmounts)` | Task 4 Scope 2 |
+| `updateRecurringSchedule(scheduleId, updates)` | Task 4 Scope 3 |
+| `createSkip(recurring_id, skip_date)` | Task 5 Scope 1 |
+| `endSeriesAfter(scheduleId, end_date)` | Task 5 Scope 2 |
+| `deleteSchedule(scheduleId)` | Task 5 Scope 3 |
+
+---
+
+## Design Decisions
+
+**Decision A2 (weekday_only scope):** Weekday-only is series-level. Only changeable via Scope 3. Scopes 1/2 read-only/hidden.
+
+**Decision B1 (start_date = first occurrence):** Generator treats start_date as first occurrence. Add form defaults to first date matching frequency + day anchor. No engine change.
 
 ---
 

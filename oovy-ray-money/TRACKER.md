@@ -4,6 +4,7 @@
 Last Updated: 2026-05-21
 Active Sprint: 6 — Recurring Transactions
 Sprint Progress: 0/7 tasks
+Spec Status: Reviewed — 10 flaws found, 9 fixed (Decisions A2, B1 incorporated)
 
 ---
 
@@ -105,6 +106,7 @@ _None yet_
 ## Spec Gaps Log
 | Date | Description | Resolution | Status |
 |------|-------------|------------|--------|
+| 2026-05-21 | Sprint 6 review: 10 flaws found (weekday_only contradiction, missing TimelineEntry type, dangling FK) | 9 fixed in spec v2. Migration 001 run for FK ON DELETE SET NULL. | Resolved |
 
 ## Completed Sprints
 - **Sprint 1 — Foundation** — completed 2026-05-20 (6/6 tasks)
