@@ -18,6 +18,7 @@ export interface Account {
   currency: Currency
   include_in_cash_balance: boolean
   include_in_review: boolean
+  show_on_iphone_home: boolean
   opening_balance: number       // DECIMAL(12,2) — wrap in new Decimal() before use
   opening_date: string          // DATE as ISO string
   display_order: number

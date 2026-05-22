@@ -17,13 +17,19 @@ const PRESET_GRADIENTS = [
   { from: '#4a3520', to: '#8b6914', name: 'Bronze' },
 ]
 
-function Toggle({ checked, onChange, disabled }: { checked: boolean; onChange: (v: boolean) => void; disabled?: boolean }) {
+function Toggle({
+  checked,
+  onChange,
+}: {
+  checked: boolean
+  onChange: (v: boolean) => void
+}) {
   return (
     <button
-      onClick={() => !disabled && onChange(!checked)}
-      className={`relative inline-flex h-6 w-11 shrink-0 rounded-full border-2 border-transparent transition-colors ${
-        disabled ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'
-      } ${checked ? 'bg-[#1c1c1e]' : 'bg-black/20'}`}
+      onClick={() => onChange(!checked)}
+      className={`relative inline-flex h-6 w-11 shrink-0 rounded-full border-2 border-transparent transition-colors cursor-pointer ${
+        checked ? 'bg-[#34c759]' : 'bg-black/20'
+      }`}
     >
       <span
         className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-sm ring-0 transition-transform ${
@@ -34,14 +40,45 @@ function Toggle({ checked, onChange, disabled }: { checked: boolean; onChange: (
   )
 }
 
-export default function AccountSettingsPage({ params }: { params: Promise<{ id: string }> }) {
+function SectionLabel({ title }: { title: string }) {
+  return (
+    <p className="text-[12px] font-semibold uppercase tracking-[0.08em] text-black/35 px-1 mb-2">
+      {title}
+    </p>
+  )
+}
+
+function LockedField({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex items-center justify-between px-4 h-[52px] border-b border-black/[0.05] last:border-0">
+      <span className="text-[16px] font-medium text-black/30">{label}</span>
+      <span className="text-[16px] text-black/25">{value}</span>
+    </div>
+  )
+}
+
+const ACCOUNT_TYPE_LABELS: Record<string, string> = {
+  CURRENT: 'Current',
+  SAVINGS: 'Savings',
+  CREDIT: 'Credit',
+  DEBT: 'Debt',
+  TRACKING: 'Tracking',
+  EXTERNAL: 'External',
+}
+
+const CURRENCY_LABELS: Record<string, string> = {
+  GBP: 'GBP £',
+  NZD: 'NZD NZ$',
+}
+
+export default function AccountEditPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
   const router = useRouter()
   const supabase = createSupabaseBrowserClient()
   const [account, setAccount] = useState<Account | null>(null)
   const [name, setName] = useState('')
-  const [editingName, setEditingName] = useState(false)
   const [showArchiveConfirm, setShowArchiveConfirm] = useState(false)
+  const [showUnarchiveConfirm, setShowUnarchiveConfirm] = useState(false)
   const [saving, setSaving] = useState(false)
 
   useEffect(() => {
@@ -70,11 +107,13 @@ export default function AccountSettingsPage({ params }: { params: Promise<{ id: 
     if (data) setAccount(data)
   }
 
-  async function saveName() {
+  async function handleSave() {
     const trimmed = name.trim()
     if (!trimmed || !account) return
-    setEditingName(false)
+    setSaving(true)
     await updateAccount({ name: trimmed })
+    setSaving(false)
+    router.back()
   }
 
   async function handleArchive() {
@@ -85,9 +124,18 @@ export default function AccountSettingsPage({ params }: { params: Promise<{ id: 
     router.push('/settings/accounts')
   }
 
-  const isTracking = account?.type === 'TRACKING'
+  async function handleUnarchive() {
+    if (!account) return
+    setSaving(true)
+    await updateAccount({ is_archived: false })
+    setSaving(false)
+    router.push('/settings/accounts')
+  }
+
   const balance = account ? new Decimal(account.opening_balance) : new Decimal(0)
   const hasBalance = balance.abs().gt(0)
+  const currencySymbol = account?.currency === 'GBP' ? '£' : 'NZ$'
+  const nameEmpty = name.trim() === ''
 
   if (!account) {
     return (
@@ -114,46 +162,27 @@ export default function AccountSettingsPage({ params }: { params: Promise<{ id: 
           {account.name}
         </h1>
 
-        {/* Name */}
+        {/* Account Name */}
+        <SectionLabel title="Account Name" />
         <div className="rounded-[14px] overflow-hidden border border-black/[0.06] bg-white mb-6">
-          <div className="px-4 py-3.5 border-b border-black/[0.05]">
-            <p className="text-[12px] font-semibold uppercase tracking-[0.08em] text-black/35 mb-1.5">
-              Name
-            </p>
-            {editingName ? (
-              <input
-                autoFocus
-                value={name}
-                maxLength={50}
-                onChange={(e) => setName(e.target.value)}
-                onBlur={saveName}
-                onKeyDown={(e) => { if (e.key === 'Enter') saveName() }}
-                className="w-full text-[16px] font-medium text-[#1c1c1e] bg-transparent outline-none border-b border-black/20 pb-0.5"
-              />
-            ) : (
-              <button
-                onClick={() => setEditingName(true)}
-                className="w-full text-left text-[16px] font-medium text-[#1c1c1e] flex items-center justify-between"
-              >
-                {account.name}
-                <span className="text-[13px] text-black/25">Edit</span>
-              </button>
-            )}
+          <div className="px-4 py-3">
+            <input
+              value={name}
+              maxLength={50}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Account name required"
+              className="w-full text-[16px] font-medium text-[#1c1c1e] bg-transparent outline-none placeholder:text-black/25"
+            />
           </div>
         </div>
 
-        {/* Colour */}
-        <p className="text-[12px] font-semibold uppercase tracking-[0.08em] text-black/35 px-1 mb-2">
-          Colour
-        </p>
+        {/* Card Colour */}
+        <SectionLabel title="Card Colour" />
         <div className="rounded-[14px] overflow-hidden border border-black/[0.06] bg-white mb-6 p-4">
-          {/* Preview strip */}
           <div
             className="w-full h-10 rounded-xl mb-4"
             style={{ background: `linear-gradient(135deg, ${account.color_from}, ${account.color_to})` }}
           />
-
-          {/* Preset swatches */}
           <div className="grid grid-cols-8 gap-2 mb-4">
             {PRESET_GRADIENTS.map((g) => {
               const selected = account.color_from === g.from && account.color_to === g.to
@@ -168,8 +197,6 @@ export default function AccountSettingsPage({ params }: { params: Promise<{ id: 
               )
             })}
           </div>
-
-          {/* Custom inputs */}
           <div className="flex items-center gap-3">
             <div className="flex-1">
               <p className="text-[11px] text-black/35 mb-1">From</p>
@@ -193,45 +220,77 @@ export default function AccountSettingsPage({ params }: { params: Promise<{ id: 
           </div>
         </div>
 
-        {/* Visibility */}
-        <p className="text-[12px] font-semibold uppercase tracking-[0.08em] text-black/35 px-1 mb-2">
-          Visibility
-        </p>
+        {/* Visibility toggles */}
+        <SectionLabel title="Visibility" />
         <div className="rounded-[14px] overflow-hidden border border-black/[0.06] bg-white mb-6">
-          <div className="flex items-center justify-between px-4 h-[52px] border-b border-black/[0.05]">
-            <span className="text-[16px] font-medium text-[#1c1c1e]">Include in Cash Balance</span>
+          <div className="flex items-center justify-between px-4 h-[56px] border-b border-black/[0.05]">
+            <div>
+              <p className="text-[16px] font-medium text-[#1c1c1e]">Include in Cash Balance</p>
+              <p className="text-[12px] text-black/35">Counts toward home total</p>
+            </div>
             <Toggle
               checked={account.include_in_cash_balance}
               onChange={(v) => updateAccount({ include_in_cash_balance: v })}
-              disabled={!isTracking}
             />
           </div>
-          <div className="flex items-center justify-between px-4 h-[52px]">
-            <span className="text-[16px] font-medium text-[#1c1c1e]">Include in Review</span>
+          <div className="flex items-center justify-between px-4 h-[56px] border-b border-black/[0.05]">
+            <div>
+              <p className="text-[16px] font-medium text-[#1c1c1e]">Include in Weekly Review</p>
+              <p className="text-[12px] text-black/35">Appears in review flashcards</p>
+            </div>
             <Toggle
               checked={account.include_in_review}
               onChange={(v) => updateAccount({ include_in_review: v })}
-              disabled={!isTracking}
+            />
+          </div>
+          <div className="flex items-center justify-between px-4 h-[56px]">
+            <div>
+              <p className="text-[16px] font-medium text-[#1c1c1e]">Hide from Home Screen</p>
+              <p className="text-[12px] text-black/35">iPhone only — iPad unaffected</p>
+            </div>
+            <Toggle
+              checked={!account.show_on_iphone_home}
+              onChange={(v) => updateAccount({ show_on_iphone_home: !v })}
             />
           </div>
         </div>
 
-        {/* Archive */}
-        <div className="rounded-[14px] overflow-hidden border border-black/[0.06] bg-white">
-          <button
-            onClick={() => {
-              if (hasBalance) {
-                setShowArchiveConfirm(true)
-              } else {
-                handleArchive()
-              }
-            }}
-            disabled={saving}
-            className="w-full h-[52px] flex items-center justify-center text-[16px] font-medium text-red-500 hover:bg-red-50 transition-colors disabled:opacity-50"
-          >
-            Archive Account
-          </button>
+        {/* Locked fields */}
+        <SectionLabel title="Account Details" />
+        <div className="rounded-[14px] overflow-hidden border border-black/[0.06] bg-white mb-6">
+          <LockedField label="Account Type" value={ACCOUNT_TYPE_LABELS[account.type] ?? account.type} />
+          <LockedField label="Currency" value={CURRENCY_LABELS[account.currency] ?? account.currency} />
         </div>
+
+        {/* Archive / Unarchive */}
+        <div className="rounded-[14px] overflow-hidden border border-black/[0.06] bg-white mb-6">
+          {account.is_archived ? (
+            <button
+              onClick={() => setShowUnarchiveConfirm(true)}
+              disabled={saving}
+              className="w-full h-[52px] flex items-center justify-center text-[16px] font-medium text-[#1c1c1e] hover:bg-black/[0.02] transition-colors disabled:opacity-50"
+            >
+              Unarchive Account
+            </button>
+          ) : (
+            <button
+              onClick={() => hasBalance ? setShowArchiveConfirm(true) : setShowArchiveConfirm(true)}
+              disabled={saving}
+              className="w-full h-[52px] flex items-center justify-center text-[16px] font-medium text-red-500 hover:bg-red-50 transition-colors disabled:opacity-50"
+            >
+              Archive Account
+            </button>
+          )}
+        </div>
+
+        {/* Save Changes */}
+        <button
+          onClick={handleSave}
+          disabled={nameEmpty || saving}
+          className="w-full h-[52px] rounded-[14px] bg-[#1c1c1e] text-[16px] font-semibold text-white disabled:opacity-30 transition-opacity active:opacity-80"
+        >
+          {saving ? 'Saving…' : 'Save Changes'}
+        </button>
       </div>
 
       {/* Archive confirmation */}
@@ -239,12 +298,23 @@ export default function AccountSettingsPage({ params }: { params: Promise<{ id: 
         <div className="fixed inset-0 z-50 flex items-center justify-center px-6">
           <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={() => setShowArchiveConfirm(false)} />
           <div className="relative bg-white rounded-[20px] p-6 w-full max-w-sm">
-            <h2 className="text-[17px] font-semibold text-[#1c1c1e] mb-2">Archive Account?</h2>
-            <p className="text-[14px] text-black/50 mb-6">
-              This account has a balance of {account.currency === 'GBP' ? '£' : 'NZ$'}
-              {Math.abs(account.opening_balance).toFixed(2)}.
-              Archive anyway?
-            </p>
+            <h2 className="text-[17px] font-semibold text-[#1c1c1e] mb-2">
+              Archive &ldquo;{account.name}&rdquo;?
+            </h2>
+            {hasBalance ? (
+              <p className="text-[14px] text-black/50 mb-6">
+                This account has a forecast balance of {currencySymbol}
+                {balance.abs().toFixed(2)}.{' '}
+                Archiving will hide it from your home screen and exclude it from all totals.
+                Any future transactions will remain in the forecast but will not be visible
+                unless unarchived.
+              </p>
+            ) : (
+              <p className="text-[14px] text-black/50 mb-6">
+                This account will be hidden from your home screen and excluded from all totals.
+                You can unarchive it at any time.
+              </p>
+            )}
             <div className="flex gap-3">
               <button
                 onClick={() => setShowArchiveConfirm(false)}
@@ -257,7 +327,38 @@ export default function AccountSettingsPage({ params }: { params: Promise<{ id: 
                 disabled={saving}
                 className="flex-1 h-[44px] rounded-xl bg-red-500 text-[15px] font-medium text-white disabled:opacity-50"
               >
-                Archive
+                {hasBalance ? 'Archive Anyway' : 'Archive'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Unarchive confirmation */}
+      {showUnarchiveConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center px-6">
+          <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={() => setShowUnarchiveConfirm(false)} />
+          <div className="relative bg-white rounded-[20px] p-6 w-full max-w-sm">
+            <h2 className="text-[17px] font-semibold text-[#1c1c1e] mb-2">
+              Unarchive &ldquo;{account.name}&rdquo;?
+            </h2>
+            <p className="text-[14px] text-black/50 mb-6">
+              This account will reappear on your home screen and be included in totals
+              based on its current toggle settings.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowUnarchiveConfirm(false)}
+                className="flex-1 h-[44px] rounded-xl bg-black/[0.05] text-[15px] font-medium text-[#1c1c1e]"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => { setShowUnarchiveConfirm(false); handleUnarchive() }}
+                disabled={saving}
+                className="flex-1 h-[44px] rounded-xl bg-[#1c1c1e] text-[15px] font-medium text-white disabled:opacity-50"
+              >
+                Unarchive
               </button>
             </div>
           </div>

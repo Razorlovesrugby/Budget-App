@@ -12,6 +12,7 @@ function makeAccount(overrides: Partial<Account> = {}): Account {
     currency: 'GBP',
     include_in_cash_balance: true,
     include_in_review: true,
+    show_on_iphone_home: true,
     opening_balance: 1000,
     opening_date: '2026-01-01',
     display_order: 1,
