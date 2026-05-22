@@ -9,12 +9,10 @@ const config: Config = {
   theme: {
     extend: {
       screens: {
-        // iPhone layout (default, mobile-first)
-        // < 768px: iPhone card stack, bottom nav
-        // >= 768px: iPad portrait
-        'tablet': '768px',
-        // >= 1024px: iPad landscape, full cockpit
-        'desktop': '1024px',
+        // iPad mini portrait and up → cockpit grid
+        'md': '744px',
+        // iPad landscape
+        'lg': '1024px',
       },
       fontVariantNumeric: {
         'tabular': 'tabular-nums',
