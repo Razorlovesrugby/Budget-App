@@ -4,6 +4,29 @@ import { NextResponse, type NextRequest } from 'next/server'
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request })
 
+  const { pathname } = request.nextUrl
+  const isPublicPath = pathname === '/login' || pathname.startsWith('/auth/')
+
+  // Quick cookie check — near-zero cost vs. ~200–400ms getUser() API call
+  const hasSession =
+    request.cookies.has('sb-access-token') ||
+    request.cookies.has('sb-refresh-token') ||
+    // Supabase SSR stores auth in a cookie named after the project ref
+    [...request.cookies.getAll()].some(({ name }) => name.startsWith('sb-') && name.endsWith('-auth-token'))
+
+  if (!hasSession && !isPublicPath) {
+    const url = request.nextUrl.clone()
+    url.pathname = '/login'
+    return NextResponse.redirect(url)
+  }
+
+  if (hasSession && pathname === '/login') {
+    const url = request.nextUrl.clone()
+    url.pathname = '/'
+    return NextResponse.redirect(url)
+  }
+
+  // Still create the Supabase client so it can refresh the session cookie if needed
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -25,24 +48,8 @@ export async function updateSession(request: NextRequest) {
     }
   )
 
-  // Refresh session — must await to keep session alive
-  const { data: { user } } = await supabase.auth.getUser()
-
-  // Protect all routes except login and auth callback
-  const { pathname } = request.nextUrl
-  const isPublicPath = pathname === '/login' || pathname.startsWith('/auth/')
-
-  if (!user && !isPublicPath) {
-    const url = request.nextUrl.clone()
-    url.pathname = '/login'
-    return NextResponse.redirect(url)
-  }
-
-  if (user && pathname === '/login') {
-    const url = request.nextUrl.clone()
-    url.pathname = '/'
-    return NextResponse.redirect(url)
-  }
+  // Refresh session cookie (lightweight — no API call, just reads/writes cookies)
+  await supabase.auth.getSession()
 
   return supabaseResponse
 }

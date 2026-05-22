@@ -1,5 +1,6 @@
 'use client'
 
+import { memo, useMemo, useCallback, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import type { Account } from '@/types'
 import { formatMoney, toDecimal } from '@/lib/utils/money'
@@ -12,7 +13,7 @@ interface AccountCardProps {
   onPress?: (accountId: string) => void
 }
 
-export default function AccountCard({
+const AccountCard = memo(function AccountCard({
   account,
   actualBalance,
   budgetBalance,
@@ -20,19 +21,24 @@ export default function AccountCard({
 }: AccountCardProps) {
   const router = useRouter()
 
-  const dActual = toDecimal(actualBalance)
-  const dBudget = toDecimal(budgetBalance)
+  const dActual = useMemo(() => toDecimal(actualBalance), [actualBalance])
+  const dBudget = useMemo(() => toDecimal(budgetBalance), [budgetBalance])
 
-  const formattedDate = lastUpdatedDate
-    ? new Date(lastUpdatedDate).toLocaleDateString('en-GB', {
-        day: 'numeric',
-        month: 'short',
-      })
-    : ''
+  const formattedDate = useMemo(() => {
+    if (!lastUpdatedDate) return ''
+    return new Date(lastUpdatedDate).toLocaleDateString('en-GB', {
+      day: 'numeric',
+      month: 'short',
+    })
+  }, [lastUpdatedDate])
 
-  const handlePress = () => {
+  const handlePress = useCallback(() => {
     router.push(`/accounts/${account.id}`)
-  }
+  }, [router, account.id])
+
+  useEffect(() => {
+    router.prefetch(`/accounts/${account.id}`)
+  }, [router, account.id])
 
   return (
     <button
@@ -69,4 +75,6 @@ export default function AccountCard({
       </div>
     </button>
   )
-}
+})
+
+export default AccountCard

@@ -1,3 +1,6 @@
+'use client'
+
+import { memo } from 'react'
 import type { Currency } from '@/types'
 import { toDecimal } from '@/lib/utils/money'
 
@@ -22,7 +25,7 @@ function formatNumber(num: number): string {
   })
 }
 
-export default function AmountDisplay({
+const AmountDisplay = memo(function AmountDisplay({
   amount,
   currency,
   variant,
@@ -38,7 +41,6 @@ export default function AmountDisplay({
 
   switch (variant) {
     case 'debit':
-      // Always bracketed — amount is positive, displayed as debit
       display = `(${prefix}${formatNumber(d.toDecimalPlaces(2).toNumber())})`
       break
     case 'variance':
@@ -65,4 +67,6 @@ export default function AmountDisplay({
       {display}
     </span>
   )
-}
+})
+
+export default AmountDisplay

@@ -1,5 +1,6 @@
 'use client'
 
+import { memo } from 'react'
 import type { Account, Currency } from '@/types'
 
 interface AccountPickerProps {
@@ -21,7 +22,7 @@ function groupByCurrency(accounts: Account[]): Map<Currency, Account[]> {
   return map
 }
 
-export default function AccountPicker({
+const AccountPicker = memo(function AccountPicker({
   accounts,
   selectedId,
   excludeId,
@@ -161,4 +162,6 @@ export default function AccountPicker({
       `}</style>
     </div>
   )
-}
+})
+
+export default AccountPicker

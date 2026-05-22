@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter, useParams } from 'next/navigation'
+import { useQueryClient } from '@tanstack/react-query'
 import type {
   Account,
   RecurringSchedule,
@@ -25,6 +26,7 @@ export default function EditRecurringClient() {
   const router = useRouter()
   const params = useParams()
   const scheduleId = params.id as string
+  const queryClient = useQueryClient()
 
   const [schedule, setSchedule] = useState<RecurringSchedule | null>(null)
   const [accounts, setAccounts] = useState<Account[]>([])
@@ -96,9 +98,13 @@ export default function EditRecurringClient() {
         }
       }
 
+      queryClient.invalidateQueries({ queryKey: ['schedules'] })
+      queryClient.invalidateQueries({ queryKey: ['skips'] })
+      queryClient.invalidateQueries({ queryKey: ['overrides'] })
+      queryClient.invalidateQueries({ queryKey: ['accounts'] })
       router.push('/recurring')
     },
-    [schedule, scheduleId, router]
+    [schedule, scheduleId, router, queryClient]
   )
 
   const handleDelete = useCallback(
@@ -120,10 +126,13 @@ export default function EditRecurringClient() {
         }
       }
 
+      queryClient.invalidateQueries({ queryKey: ['schedules'] })
+      queryClient.invalidateQueries({ queryKey: ['skips'] })
+      queryClient.invalidateQueries({ queryKey: ['overrides'] })
       setShowDelete(false)
       router.push('/recurring')
     },
-    [scheduleId, router]
+    [scheduleId, router, queryClient]
   )
 
   if (loading) {

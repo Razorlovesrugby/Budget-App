@@ -1,3 +1,6 @@
+'use client'
+
+import { memo } from 'react'
 import type { Transaction, Currency } from '@/types'
 import type { RecurringOccurrence } from '@/lib/forecast/recurring'
 import { formatMoney, formatDebit, toDecimal } from '@/lib/utils/money'
@@ -13,7 +16,7 @@ interface TransactionRowProps {
   accountNames: Map<string, string>
 }
 
-export default function TransactionRow({
+const TransactionRow = memo(function TransactionRow({
   item,
   isFuture,
   viewingAccountId,
@@ -69,4 +72,6 @@ export default function TransactionRow({
       </span>
     </div>
   )
-}
+})
+
+export default TransactionRow

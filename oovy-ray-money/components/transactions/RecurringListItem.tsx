@@ -1,5 +1,6 @@
 'use client'
 
+import { memo } from 'react'
 import type { RecurringSchedule, Currency } from '@/types'
 import { getNextOccurrenceDate, formatNextOccurrence } from '@/lib/forecast/next-occurrence'
 import { useRouter } from 'next/navigation'
@@ -60,7 +61,7 @@ function formatAmount(amount: number, currency: Currency): string {
   return `${prefix}${amount.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
 }
 
-export default function RecurringListItem({
+const RecurringListItem = memo(function RecurringListItem({
   schedule,
   fromAccountName,
   toAccountName,
@@ -115,4 +116,6 @@ export default function RecurringListItem({
       </p>
     </button>
   )
-}
+})
+
+export default RecurringListItem

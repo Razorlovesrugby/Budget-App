@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useRef, useEffect } from 'react'
+import { memo, useMemo, useRef, useEffect } from 'react'
 import type {
   Transaction,
   RecurringSchedule,
@@ -22,7 +22,7 @@ interface TransactionTimelineProps {
   jumpToDate?: Date | null
 }
 
-export default function TransactionTimeline({
+const TransactionTimeline = memo(function TransactionTimeline({
   accountId,
   transactions,
   schedules,
@@ -205,4 +205,6 @@ export default function TransactionTimeline({
       )}
     </div>
   )
-}
+})
+
+export default TransactionTimeline

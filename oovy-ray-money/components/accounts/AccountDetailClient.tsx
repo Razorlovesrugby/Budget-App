@@ -60,9 +60,10 @@ export default function AccountDetailClient({
 
   return (
     <main className="min-h-screen bg-[#f2f2f7] flex flex-col overflow-hidden">
-      {/* Header */}
-      <div className="h-[54px] shrink-0" />
-      <div className="flex items-center justify-between px-6 pb-3 shrink-0">
+      {/* Sticky header */}
+      <div className="shrink-0 sticky top-0 z-10 bg-[#f2f2f7]">
+      <div className="h-[54px]" />
+      <div className="flex items-center justify-between px-6 pb-3">
         <Link
           href="/"
           className="w-9 h-9 rounded-full bg-black/5 flex items-center justify-center text-[#1c1c1e] text-lg hover:bg-black/10 transition-colors"
@@ -86,6 +87,7 @@ export default function AccountDetailClient({
             ⋯
           </button>
         </div>
+      </div>
       </div>
 
       {/* Date picker modal */}

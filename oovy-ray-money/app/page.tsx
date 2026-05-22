@@ -1,49 +1,52 @@
-import { createSupabaseServerClient } from '@/lib/supabase/server'
-import { redirect } from 'next/navigation'
-import type { Account, Transaction, RecurringSchedule, RecurringSkip, RecurringOverride, Settings } from '@/types'
+'use client'
+
+import { useEffect } from 'react'
+import { useAccounts, useSettings, useTransactions, useSchedules, useSkips, useOverrides } from '@/lib/hooks/use-app-data'
 import IPhoneHome from '@/components/home/IPhoneHome'
 import { CockpitGrid } from '@/components/grid/CockpitGrid'
 import { SetupChecker } from '@/components/ui/SetupChecker'
 
-export default async function HomePage() {
-  const supabase = createSupabaseServerClient()
-  const { data: { user } } = await supabase.auth.getUser()
+const DEFAULT_SETTINGS = {
+  id: '',
+  summary_target_date: null,
+  budget_comparison_date: null,
+  exchange_rate_gbp_nzd: 2.0,
+  exchange_rate_auto_fetch: false,
+  exchange_rate_updated_at: null,
+  created_at: '',
+  updated_at: '',
+} as const
 
-  if (!user) redirect('/login')
+export default function HomePage() {
+  const { data: accounts = [], isLoading: accountsLoading } = useAccounts()
+  const { data: settings, isLoading: settingsLoading } = useSettings()
+  const { data: transactions = [] } = useTransactions()
+  const { data: schedules = [] } = useSchedules()
+  const { data: skips = [] } = useSkips()
+  const { data: overrides = [] } = useOverrides()
 
-  const [accRes, settingsRes, txRes, schedRes, skipRes, ovRes] = await Promise.all([
-    supabase
-      .from('accounts')
-      .select('*')
-      .eq('is_archived', false)
-      .eq('is_system', false)
-      .order('display_order')
-      .returns<Account[]>(),
-    supabase.from('settings').select('*').single<Settings>(),
-    supabase.from('transactions').select('*').returns<Transaction[]>(),
-    supabase.from('recurring_schedules').select('*').eq('is_active', true).returns<RecurringSchedule[]>(),
-    supabase.from('recurring_skips').select('*').returns<RecurringSkip[]>(),
-    supabase.from('recurring_overrides').select('*').returns<RecurringOverride[]>(),
-  ])
+  useEffect(() => {
+    if (accounts.length > 0) {
+      console.timeEnd('home-page-ready')
+    }
+  }, [accounts])
 
-  const accounts = accRes.data ?? []
-  const settings = settingsRes.data ?? {
-    id: '',
-    summary_target_date: null,
-    budget_comparison_date: null,
-    exchange_rate_gbp_nzd: 2.0,
-    exchange_rate_auto_fetch: false,
-    exchange_rate_updated_at: null,
-    created_at: '',
-    updated_at: '',
+  if (accountsLoading || (settingsLoading && !settings)) {
+    if (typeof window !== 'undefined') console.time('home-page-ready')
+    return (
+      <main className="min-h-screen bg-[#f2f2f7]">
+        <div className="h-[54px]" />
+        <div className="px-6">
+          <div className="h-8 w-48 bg-black/5 rounded animate-pulse mb-4" />
+          <div className="h-10 w-36 bg-black/5 rounded animate-pulse" />
+        </div>
+      </main>
+    )
   }
-  const transactions = txRes.data ?? []
-  const schedules = schedRes.data ?? []
-  const skips = skipRes.data ?? []
-  const overrides = ovRes.data ?? []
 
+  const resolvedSettings = settings ?? DEFAULT_SETTINGS
   const nonOpeningCount = transactions.filter((t) => t.type !== 'OPENING').length
-  const needsSetup = !settings.summary_target_date && nonOpeningCount === 0
+  const needsSetup = !resolvedSettings.summary_target_date && nonOpeningCount === 0
 
   return (
     <>
@@ -52,17 +55,16 @@ export default async function HomePage() {
       <div className="md:hidden">
         <IPhoneHome
           accounts={accounts}
-          settings={settings}
+          settings={resolvedSettings}
           transactions={transactions}
           schedules={schedules}
           skips={skips}
           overrides={overrides}
         />
       </div>
-
       {/* iPad cockpit grid — hidden below md */}
       <div className="hidden md:block">
-        <CockpitGrid initialAccounts={accounts} settings={settings} />
+        <CockpitGrid initialAccounts={accounts} settings={resolvedSettings} />
       </div>
     </>
   )

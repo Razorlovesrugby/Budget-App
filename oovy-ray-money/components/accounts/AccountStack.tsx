@@ -1,16 +1,17 @@
 'use client'
 
+import { memo } from 'react'
 import type { Account } from '@/types'
 import AccountCard from './AccountCard'
 
 interface AccountStackProps {
   accounts: Account[]
-  actualBalances: Map<string, number>
-  budgetBalances: Map<string, number>
-  lastUpdatedDates: Map<string, string>
+  actualBalances: Record<string, number>
+  budgetBalances: Record<string, number>
+  lastUpdatedDates: Record<string, string>
 }
 
-export default function AccountStack({
+const AccountStack = memo(function AccountStack({
   accounts,
   actualBalances,
   budgetBalances,
@@ -29,10 +30,11 @@ export default function AccountStack({
 
   return (
     <div
-      className="h-full overflow-y-auto overflow-x-hidden px-6 pb-6"
+      className="h-full overflow-y-auto overflow-x-hidden px-6"
       style={{
-        overscrollBehavior: 'none',
+        overscrollBehavior: 'contain',
         WebkitOverflowScrolling: 'touch',
+        paddingBottom: '200px',
       }}
     >
       <div className="flex flex-col">
@@ -46,9 +48,9 @@ export default function AccountStack({
             >
               <AccountCard
                 account={account}
-                actualBalance={actualBalances.get(account.id) ?? account.opening_balance}
-                budgetBalance={budgetBalances.get(account.id) ?? account.opening_balance}
-                lastUpdatedDate={lastUpdatedDates.get(account.id)}
+                actualBalance={actualBalances[account.id] ?? account.opening_balance}
+                budgetBalance={budgetBalances[account.id] ?? account.opening_balance}
+                lastUpdatedDate={lastUpdatedDates[account.id]}
               />
             </div>
           )
@@ -56,4 +58,6 @@ export default function AccountStack({
       </div>
     </div>
   )
-}
+})
+
+export default AccountStack

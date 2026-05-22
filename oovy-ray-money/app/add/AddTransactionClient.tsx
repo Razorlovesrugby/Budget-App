@@ -9,11 +9,13 @@ import type { Account, TransactionType, NewTransaction } from '@/types'
 import AccountPicker from '@/components/accounts/AccountPicker'
 import DatePicker from '@/components/ui/DatePicker'
 import { useForecastStore } from '@/hooks/useForecast'
+import { useQueryClient } from '@tanstack/react-query'
 
 export default function AddTransactionClient() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const supabase = createSupabaseBrowserClient()
+  const queryClient = useQueryClient()
 
   // Context from URL
   const fromAccountId = searchParams.get('fromAccountId')
@@ -157,7 +159,9 @@ export default function AddTransactionClient() {
 
       if (insertError) throw insertError
 
-      // Invalidate forecast
+      // Invalidate React Query cache and legacy forecast store
+      queryClient.invalidateQueries({ queryKey: ['transactions'] })
+      queryClient.invalidateQueries({ queryKey: ['accounts'] })
       invalidate()
 
       // Navigate back

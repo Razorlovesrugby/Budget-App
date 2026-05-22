@@ -6,9 +6,11 @@ import type { Account, RecurringFormData } from '@/types'
 import { createSupabaseBrowserClient } from '@/lib/supabase/client'
 import RecurringForm from '@/components/transactions/RecurringForm'
 import { createRecurringSchedule } from '@/lib/db/recurring'
+import { useQueryClient } from '@tanstack/react-query'
 
 export default function AddRecurringClient() {
   const router = useRouter()
+  const queryClient = useQueryClient()
   const [accounts, setAccounts] = useState<Account[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -28,6 +30,8 @@ export default function AddRecurringClient() {
 
   const handleSubmit = async (data: RecurringFormData) => {
     await createRecurringSchedule(data)
+    queryClient.invalidateQueries({ queryKey: ['schedules'] })
+    queryClient.invalidateQueries({ queryKey: ['accounts'] })
     router.push('/recurring')
   }
 

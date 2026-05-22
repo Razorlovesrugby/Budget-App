@@ -12,6 +12,10 @@
   --border: rgba(0, 0, 0, 0.08);
 }
 
+html {
+  touch-action: manipulation;
+}
+
 body {
   color: var(--foreground);
   background: var(--background);
