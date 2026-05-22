@@ -1,5 +1,0 @@
-{
-  "buildCommand": "cd oovy-ray-money && npm install && npm run build",
-  "outputDirectory": "oovy-ray-money/.next",
-  "installCommand": "cd oovy-ray-money && npm install"
-}
