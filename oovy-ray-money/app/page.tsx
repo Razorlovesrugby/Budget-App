@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import type { Account, Transaction, RecurringSchedule, RecurringSkip, RecurringOverride, Settings } from '@/types'
 import IPhoneHome from '@/components/home/IPhoneHome'
 import { CockpitGrid } from '@/components/grid/CockpitGrid'
+import { SetupChecker } from '@/components/ui/SetupChecker'
 
 export default async function HomePage() {
   const supabase = createSupabaseServerClient()
@@ -41,8 +42,12 @@ export default async function HomePage() {
   const skips = skipRes.data ?? []
   const overrides = ovRes.data ?? []
 
+  const nonOpeningCount = transactions.filter((t) => t.type !== 'OPENING').length
+  const needsSetup = !settings.summary_target_date && nonOpeningCount === 0
+
   return (
     <>
+      <SetupChecker needsSetup={needsSetup} />
       {/* iPhone layout — hidden at md+ */}
       <div className="md:hidden">
         <IPhoneHome

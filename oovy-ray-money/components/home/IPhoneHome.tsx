@@ -5,6 +5,7 @@ import { calculateAllBudgets } from '@/lib/forecast/engine'
 import { parseDate } from '@/lib/utils/dates'
 import AmountDisplay from '@/components/ui/AmountDisplay'
 import AccountStack from '@/components/accounts/AccountStack'
+import { HomeMenuButton } from '@/components/ui/HomeMenuButton'
 
 interface IPhoneHomeProps {
   accounts: Account[]
@@ -116,9 +117,7 @@ export default function IPhoneHome({
           >
             +
           </Link>
-          <button className="w-9 h-9 rounded-full bg-black/5 flex items-center justify-center text-[#1c1c1e] text-lg hover:bg-black/10 transition-colors">
-            ⋯
-          </button>
+          <HomeMenuButton />
         </div>
       </div>
 

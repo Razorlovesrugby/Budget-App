@@ -40,6 +40,7 @@ import { GridAddTransactionPanel } from '@/components/transactions/GridAddTransa
 import { TransactionDetailPanel } from '@/components/transactions/TransactionDetailPanel'
 import { AddAccountPanel } from '@/components/accounts/AddAccountPanel'
 import DatePicker from '@/components/ui/DatePicker'
+import { SideMenu } from '@/components/ui/SideMenu'
 import Decimal from 'decimal.js'
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -102,6 +103,7 @@ export function CockpitGrid({ initialAccounts, settings }: CockpitGridProps) {
   const [panel, setPanel] = useState<PanelState>({ type: 'none' })
   const [highlightedDate, setHighlightedDate] = useState<Date | null>(null)
   const [showDateJumper, setShowDateJumper] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
 
   // Refs
   const bodyRef = useRef<HTMLDivElement>(null)
@@ -346,9 +348,13 @@ export function CockpitGrid({ initialAccounts, settings }: CockpitGridProps) {
         >
           +
         </button>
-        <button className="w-8 h-8 rounded-full bg-black/[0.06] flex items-center justify-center text-[#1c1c1e] hover:bg-black/[0.10] transition-colors">
+        <button
+          onClick={() => setMenuOpen(true)}
+          className="w-8 h-8 rounded-full bg-black/[0.06] flex items-center justify-center text-[#1c1c1e] hover:bg-black/[0.10] transition-colors"
+        >
           ⋯
         </button>
+        <SideMenu isOpen={menuOpen} onClose={() => setMenuOpen(false)} />
       </div>
 
       {/* ── Grid Area ── */}
