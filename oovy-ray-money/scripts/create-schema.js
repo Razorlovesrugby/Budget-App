@@ -1,11 +1,13 @@
 const { Client } = require('pg');
 
+const connectionString = process.env.DATABASE_URL;
+if (!connectionString) {
+  console.error('DATABASE_URL is not set. See .env.example.');
+  process.exit(1);
+}
+
 const client = new Client({
-  host: 'aws-0-eu-west-1.pooler.supabase.com',
-  port: 5432,
-  user: 'postgres.hmrsjyormmxqasuhaoae',
-  password: 'foxmoc-sahvow-0mAdta',
-  database: 'postgres',
+  connectionString,
   ssl: { rejectUnauthorized: false },
   connectionTimeoutMillis: 15000
 });
