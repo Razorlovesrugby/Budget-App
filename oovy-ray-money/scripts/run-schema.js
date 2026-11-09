@@ -1,7 +1,13 @@
 const { Client } = require('pg');
 
+const connectionString = process.env.DATABASE_URL;
+if (!connectionString) {
+  console.error('DATABASE_URL is not set. See .env.example.');
+  process.exit(1);
+}
+
 const client = new Client({
-  connectionString: 'postgresql://postgres:foxmoc-sahvow-0mAdta@db.hmrsjyormmxqasuhaoae.supabase.co:5432/postgres',
+  connectionString,
   ssl: { rejectUnauthorized: false }
 });
 
